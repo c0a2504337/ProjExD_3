@@ -7,7 +7,7 @@ import pygame as pg
 
 WIDTH = 1100  # ゲームウィンドウの幅
 HEIGHT = 650  # ゲームウィンドウの高さ
-NUM_OF_BOMBS = 2
+NUM_OF_BOMBS = 9
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -167,6 +167,8 @@ def main():
     for _ in range(NUM_OF_BOMBS):
         bombs.append(Bomb((255, 0, 0), 10))
     beam = None  # ゲーム初期化時にはビームは存在しない
+
+    beams=[]
     clock = pg.time.Clock()
     tmr = 0
     while True:
@@ -174,6 +176,7 @@ def main():
             if event.type == pg.QUIT:
                 return
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
+                beams.append(Beam(bird))
                 # スペースキー押下でBeamクラスのインスタンス生成
                 beam = Beam(bird)            
         screen.blit(bg_img, [0, 0])
@@ -189,23 +192,25 @@ def main():
                 time.sleep(1)
                 return
 
-        for i, bomb in enumerate(bombs):
-            if beam is not None:
-                if beam.rct.colliderect(bomb.rct):  # ビームと爆弾の衝突判定
-                    beam = None
-                    bombs[i] = None
-                    bird.change_img
-                    bird.change_img(6,screen)
-                    pg.display.update()
-                    score.value += 1
+        for j, beam in enumerate(beams):
+            for i, bomb in enumerate(bombs):
+                if beam is not None and bomb is not None:
+                    if beam.rct.colliderect(bomb.rct):  # ビームと爆弾の衝突判定
+                        beams[j] = None  # beam [j] から beams[j] に修正
+                        bombs[i] = None
+                        beam = None      # 消失したビームをループ内変数でも None に設定
+                        bird.change_img(6, screen)
+                        pg.display.update()
+                        score.value += 1
                     
+        beams =[beam for beam in beams if beam is not None]
         bombs =[bomb for bomb in bombs if bomb is not None]
-    
+        beams =[beam for beam in beams if check_bound(beam.rct) == (True, True)]
         
 
         key_lst = pg.key.get_pressed()
         bird.update(key_lst, screen)
-        if beam is not None:
+        for beam in beams :
             beam.update(screen)   
         for bomb in bombs:
             bomb.update(screen)
@@ -219,4 +224,4 @@ if __name__ == "__main__":
     pg.init()
     main()
     pg.quit()
-    sys.exit()
+    sys.exit()  
