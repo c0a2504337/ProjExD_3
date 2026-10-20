@@ -24,6 +24,11 @@ def check_bound(obj_rct: pg.Rect) -> tuple[bool, bool]:
         tate = False
     return yoko, tate
 
+def draw_time(screen: pg.Surface, tmr: int) -> None:
+    font = pg.font.Font(None,77)
+    score = tmr // 50  
+    txt_img = font.render(f"Time: {score}", True, (1, 0, 0))
+    screen.blit(txt_img, (1, 1))
 
 class Bird:
     """
@@ -206,19 +211,26 @@ def main():
         beams =[beam for beam in beams if beam is not None]
         bombs =[bomb for bomb in bombs if bomb is not None]
         beams =[beam for beam in beams if check_bound(beam.rct) == (True, True)]
+
+       
         
 
         key_lst = pg.key.get_pressed()
         bird.update(key_lst, screen)
+        draw_time(screen, tmr)
         for beam in beams :
             beam.update(screen)   
         for bomb in bombs:
             bomb.update(screen)
         score.update(screen)
         pg.display.update()
+        draw_time(screen, tmr)
         tmr += 1
         clock.tick(50)
 
+        if len(bombs) == 0: 
+            pg.display.update()
+            time.sleep(3)
 
 if __name__ == "__main__":
     pg.init()
