@@ -212,9 +212,6 @@ def main():
         bombs =[bomb for bomb in bombs if bomb is not None]
         beams =[beam for beam in beams if check_bound(beam.rct) == (True, True)]
 
-       
-        
-
         key_lst = pg.key.get_pressed()
         bird.update(key_lst, screen)
         draw_time(screen, tmr)
@@ -227,6 +224,7 @@ def main():
         draw_time(screen, tmr)
         tmr += 1
         clock.tick(50)
+
 
         if len(bombs) == 0: 
             pg.display.update()
